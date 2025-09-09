@@ -13,23 +13,12 @@ A modern, reusable, and type-safe component library built with React, TypeScript
 ### InputField
 A versatile input component that supports multiple variants, sizes, states, and includes a password visibility toggle.
 
-<img width="901" height="482" alt="Screenshot 2025-09-09 044832" src="https://github.com/user-attachments/assets/889942bf-55f3-48ea-875f-4e7ad92ce464" />
-<img width="901" height="479" alt="Screenshot 2025-09-09 044846" src="https://github.com/user-attachments/assets/e94fd33d-3c43-45bd-bced-8908eceba2e0" />
-<img width="898" height="478" alt="Screenshot 2025-09-09 044856" src="https://github.com/user-attachments/assets/02820cbd-16c7-4720-99a6-d426f2734643" />
-<img width="900" height="482" alt="Screenshot 2025-09-09 044924" src="https://github.com/user-attachments/assets/f78e5783-1ddd-48cc-98f9-d58e52af6a99" />
-<img width="894" height="471" alt="Screenshot 2025-09-09 044935" src="https://github.com/user-attachments/assets/1e154010-1b3a-4c5d-900f-085f6aa45e78" />
-<img width="899" height="481" alt="Screenshot 2025-09-09 044951" src="https://github.com/user-attachments/assets/cd000aa2-79bc-46a2-a71a-0995cfa29c15" />
 
 *A showcase of the InputField's variants, states (invalid, disabled, loading), and sizes.*
 
 ### DataTable
 A powerful table for displaying data with support for sorting, row selection, custom cell rendering, and a fully responsive card-based layout for mobile devices.
 
-<img width="900" height="406" alt="Screenshot 2025-09-09 044709" src="https://github.com/user-attachments/assets/0b3a8f10-e3a5-4bbe-8494-148d8a4c2119" />
-<img width="898" height="404" alt="Screenshot 2025-09-09 044725" src="https://github.com/user-attachments/assets/c2ac5484-fa40-4515-a306-af345442992a" />
-<img width="906" height="410" alt="Screenshot 2025-09-09 044737" src="https://github.com/user-attachments/assets/62b7979d-436f-4cd0-acc8-946688f4eb8e" />
-<img width="900" height="407" alt="Screenshot 2025-09-09 044753" src="https://github.com/user-attachments/assets/2166273e-14fb-44b5-aaf3-db2a423d717b" />
-<img width="898" height="410" alt="Screenshot 2025-09-09 044805" src="https://github.com/user-attachments/assets/518501e9-35ee-408c-b7b0-172b7a71ad28" />
 
 *The DataTable demonstrating sorting, row selection, and its responsive transformation on smaller screens.*
 
@@ -171,5 +160,168 @@ The choice of tooling was deliberately focused on creating a fast, reliable, and
 -   **Vite as the Build Tool:** Provides a near-instant feedback loop thanks to its lightning-fast Hot Module Replacement (HMR).
 -   **Storybook as a Component Workshop:** Used not just for documentation, but as an isolated development environment. This allows for building and testing each component's states in a vacuum, which is crucial for creating a robust and bug-free library.
 -   **Chromatic for Visual Testing and Deployment:** Integrated Chromatic to automate deployment and add a layer of quality assurance. Chromatic captures a visual snapshot of every component, allowing it to automatically detect unintended UI changes (**visual regressions**) on future code updates. This ensures that a change to one component doesn't accidentally break another, a common problem in large projects.
-#   m y  
- 
+
+
+
+## 📖 How to Use
+
+Using these components in your own React application is straightforward. After installing the library, you can import and configure them with props.
+
+### Using the `InputField`
+
+The `InputField` is designed to be a flexible, controlled component for use in forms. You manage its state with `useState` and pass the `value` and `onChange` props.
+
+#### Example: A Simple Contact Form
+
+Here's how you might use `InputField` to build a form for user feedback.
+
+```
+import { useState } from 'react';
+import { InputField } from 'your-component-library';
+
+function ContactForm() {
+const [name, setName] = useState('');
+const [email, setEmail] = useState('');
+const [message, setMessage] = useState('');
+const [error, setError] = useState('');
+
+const handleSubmit = () => {
+if (!name || !email) {
+setError('Name and Email are required.');
+} else {
+setError('');
+console.log('Submitting:', { name, email, message });
+// API call would go here
+}
+};
+
+return (
+<div className="space-y-4 p-6 border rounded-lg max-w-lg mx-auto">
+<h2 className="text-2xl font-bold">Contact Us</h2>
+  <InputField
+    label="Full Name"
+    placeholder="John Doe"
+    value={name}
+    onChange={(e) => setName(e.target.value)}
+    invalid={!!error && !name}
+    errorMessage={!!error && !name ? "Name is required." : ""}
+  />
+  
+  <InputField
+    label="Email Address"
+    placeholder="you@example.com"
+    value={email}
+    onChange={(e) => setEmail(e.target.value)}
+    invalid={!!error && !email}
+    errorMessage={!!error && !email ? "Email is required." : ""}
+  />
+
+  {/* Using the 'ghost' variant for a larger text area feel */}
+  <InputField
+    variant="ghost"
+    label="Your Message"
+    placeholder="How can we help?"
+    value={message}
+    onChange={(e) => setMessage(e.target.value)}
+  />
+  
+  <button 
+    onClick={handleSubmit}
+    className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600"
+  >
+    Submit Feedback
+  </button>
+</div>
+);
+}
+```
+
+
+### Using the `DataTable`
+
+The `DataTable` is configured via a `columns` array, which defines the headers and how to render data for each column. Its real power comes from the custom `render` function.
+
+#### Example: Displaying a List of Products with Custom Actions
+
+In this example, we'll display a list of products. We'll use the `render` function to:
+- Format the price as currency.
+- Display a colored "Status" badge.
+- Add "Edit" and "Delete" action buttons to each row.
+
+```
+import { useState } from 'react';
+import { DataTable, Column } from 'your-component-library';
+
+// 1. Define the shape of our data
+interface Product {
+id: number;
+name: string;
+price: number;
+stock: number;
+status: 'In Stock' | 'Low Stock' | 'Out of Stock';
+}
+
+// 2. Some sample data
+const productData: Product[] = [
+{ id: 1, name: 'Wireless Mouse', price: 25.99, stock: 150, status: 'In Stock' },
+{ id: 2, name: 'Mechanical Keyboard', price: 89.99, stock: 8, status: 'Low Stock' },
+{ id: 3, name: '4K Webcam', price: 120.00, stock: 0, status: 'Out of Stock' },
+];
+
+// A small helper component for our status badges
+const StatusBadge = ({ status }: { status: Product['status'] }) => {
+const colorMap = {
+'In Stock': 'bg-green-100 text-green-700',
+'Low Stock': 'bg-yellow-100 text-yellow-700',
+'Out of Stock': 'bg-red-100 text-red-700',
+};
+return <span className={px-2 py-1 text-xs font-medium rounded-full ${colorMap[status]}}>{status}</span>;
+};
+
+// 3. Define the columns with custom render functions
+const productColumns: Column<Product>[] = [
+{ key: 'name', title: 'Product Name', dataIndex: 'name', sortable: true },
+{
+key: 'price',
+title: 'Price',
+sortable: true,
+render: (, record) => $${record.price.toFixed(2)} // Format price as currency
+},
+{ key: 'stock', title: 'Stock', dataIndex: 'stock', sortable: true },
+{
+key: 'status',
+title: 'Status',
+render: (, record) => <StatusBadge status={record.status} /> // Use a custom component
+},
+{
+key: 'actions',
+title: 'Actions',
+render: (_, record) => ( // Add interactive buttons
+<div className="space-x-2">
+<button className="text-blue-500 hover:underline" onClick={() => alert(Editing ${record.name})}>Edit</button>
+<button className="text-red-500 hover:underline" onClick={() => alert(Deleting ${record.name})}>Delete</button>
+</div>
+)
+},
+];
+
+function ProductDashboard() {
+const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
+
+return (
+<div className="space-y-4 p-6">
+<h2 className="text-2xl font-bold">Product Inventory</h2>
+
+text
+  <DataTable
+    columns={productColumns}
+    data={productData}
+    selectable={true}
+    onRowSelect={(rows) => setSelectedProducts(rows)}
+  />
+
+  <p>Selected Products: {selectedProducts.length}</p>
+</div>
+);
+}
+```
