@@ -1,0 +1,15 @@
+
+@import "tailwindcss";
+
+body {
+  font-family: 'Inter', sans-serif; 
+}
+
+@media (max-width: 767px) {
+  .responsive-table-cell::before {
+    content: attr(data-label);
+    font-weight: 600;
+    margin-right: 0.5rem;
+    display: inline-block;
+  }
+}
